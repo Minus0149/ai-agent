@@ -1,0 +1,164 @@
+version: '3.8'
+
+services:
+  # Main automation service (VPS optimized)
+  automation-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: browser-automation-backend
+    ports:
+      - "8000:8000"  # FastAPI
+      - "5901:5901"  # VNC
+      - "6080:6080"  # noVNC (websockify)
+      - "80:80"      # Nginx frontend
+    environment:
+      - DOCKER_CONTAINER=true
+      - DISPLAY=:1
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - REDIS_URL=redis://redis:6379
+      # VPS-specific optimizations
+      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+      - PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=0
+    volumes:
+      - ./logs:/app/logs
+      - ./cache:/app/cache
+      - ./configs:/app/configs
+      - ./reports:/app/reports
+      - automation_data:/app/data
+    depends_on:
+      - redis
+    restart: unless-stopped
+    networks:
+      - automation-network
+    # VPS resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 120s
+    # VPS-specific security and performance settings
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+
+  # Redis for caching and task queuing (VPS optimized)
+  redis:
+    image: redis:7-alpine
+    container_name: automation-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - automation-network
+    # VPS-optimized Redis configuration
+    command: >
+      redis-server
+      --appendonly yes
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --tcp-keepalive 300
+      --timeout 0
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Nginx reverse proxy (VPS optimized)
+  nginx:
+    image: nginx:alpine
+    container_name: automation-nginx
+    ports:
+      - "443:443"
+    volumes:
+      - ./docker/nginx-vps.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro  # For SSL certificates
+    depends_on:
+      - automation-backend
+    restart: unless-stopped
+    networks:
+      - automation-network
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.25'
+    profiles:
+      - ssl
+
+  # Watchtower for automatic updates (VPS specific)
+  watchtower:
+    image: containrrr/watchtower
+    container_name: automation-watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=3600
+      - WATCHTOWER_INCLUDE_STOPPED=true
+    restart: unless-stopped
+    profiles:
+      - auto-update
+
+  # Log aggregation for VPS monitoring
+  logrotate:
+    image: linkyard/docker-logrotate
+    container_name: automation-logrotate
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - LOGROTATE_INTERVAL=daily
+      - LOGROTATE_COPIES=7
+    restart: unless-stopped
+    profiles:
+      - logging
+
+volumes:
+  automation_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  automation-network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1450  # VPS-friendly MTU
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+          gateway: 172.20.0.1

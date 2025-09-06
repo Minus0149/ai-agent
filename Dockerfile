@@ -41,11 +41,25 @@ RUN apt-get update && apt-get install -y \
     nginx \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Google Chrome (updated method for newer Ubuntu)
-RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome-keyring.gpg \
-    && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable \
+# Install Chrome/Chromium (VPS-compatible with fallback)
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    ca-certificates \
+    && ( \
+        # Try to install Google Chrome
+        curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome-keyring.gpg \
+        && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
+        && apt-get update \
+        && apt-get install -y google-chrome-stable --no-install-recommends \
+        && echo "Google Chrome installed successfully" \
+    ) || ( \
+        # Fallback to Chromium if Chrome fails
+        echo "Chrome installation failed, installing Chromium as fallback" \
+        && apt-get update \
+        && apt-get install -y chromium-browser --no-install-recommends \
+        && echo "Chromium installed successfully" \
+    ) \
     && rm -rf /var/lib/apt/lists/*
 
 # Create application user
