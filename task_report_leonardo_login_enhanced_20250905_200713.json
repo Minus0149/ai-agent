@@ -1,0 +1,162 @@
+{
+  "task": {
+    "task_id": "leonardo_login_enhanced",
+    "description": "Navigate to leonardo.ai and login using a temp mail from temp-mail.io",
+    "status": "TaskStatus.FAILED",
+    "created_at": "2025-09-05T20:02:08.580093",
+    "started_at": "2025-09-05T20:02:08.580594",
+    "completed_at": "2025-09-05T20:07:13.373790",
+    "steps": [
+      {
+        "step_id": "step_1",
+        "action": "task_started",
+        "timestamp": "2025-09-05T20:02:08.580598",
+        "status": "TaskStatus.COMPLETED",
+        "details": {
+          "task_id": "leonardo_login_enhanced",
+          "description": "Navigate to leonardo.ai and login using a temp mail from temp-mail.io"
+        },
+        "duration": null,
+        "error": null
+      },
+      {
+        "step_id": "step_2",
+        "action": "browser_created",
+        "timestamp": "2025-09-05T20:02:08.611205",
+        "status": "TaskStatus.COMPLETED",
+        "details": {
+          "config": {
+            "headless": false,
+            "window_size": {
+              "width": 1920,
+              "height": 1080
+            },
+            "highlight_elements": true,
+            "wait_between_actions": 0.3,
+            "enable_default_extensions": true,
+            "disable_images": false,
+            "disable_javascript": false,
+            "user_agent": null,
+            "proxy": null
+          }
+        },
+        "duration": null,
+        "error": null
+      },
+      {
+        "step_id": "step_3",
+        "action": "agent_created",
+        "timestamp": "2025-09-05T20:02:08.691470",
+        "status": "TaskStatus.COMPLETED",
+        "details": {
+          "max_steps": 50
+        },
+        "duration": null,
+        "error": null
+      },
+      {
+        "step_id": "step_4",
+        "action": "task_timeout",
+        "timestamp": "2025-09-05T20:07:13.373073",
+        "status": "TaskStatus.FAILED",
+        "details": {
+          "timeout": 300
+        },
+        "duration": null,
+        "error": "Task leonardo_login_enhanced timed out after 300s"
+      },
+      {
+        "step_id": "step_5",
+        "action": "task_failed",
+        "timestamp": "2025-09-05T20:07:13.373798",
+        "status": "TaskStatus.FAILED",
+        "details": {
+          "error": "Task leonardo_login_enhanced timed out after 300s",
+          "duration": 304.6484885215759
+        },
+        "duration": null,
+        "error": "Task leonardo_login_enhanced timed out after 300s"
+      }
+    ],
+    "result": null,
+    "error": "Task leonardo_login_enhanced timed out after 300s"
+  },
+  "steps": [
+    {
+      "step_id": "step_1",
+      "action": "task_started",
+      "timestamp": "2025-09-05T20:02:08.580598",
+      "status": "TaskStatus.COMPLETED",
+      "details": {
+        "task_id": "leonardo_login_enhanced",
+        "description": "Navigate to leonardo.ai and login using a temp mail from temp-mail.io"
+      },
+      "duration": null,
+      "error": null
+    },
+    {
+      "step_id": "step_2",
+      "action": "browser_created",
+      "timestamp": "2025-09-05T20:02:08.611205",
+      "status": "TaskStatus.COMPLETED",
+      "details": {
+        "config": {
+          "headless": false,
+          "window_size": {
+            "width": 1920,
+            "height": 1080
+          },
+          "highlight_elements": true,
+          "wait_between_actions": 0.3,
+          "enable_default_extensions": true,
+          "disable_images": false,
+          "disable_javascript": false,
+          "user_agent": null,
+          "proxy": null
+        }
+      },
+      "duration": null,
+      "error": null
+    },
+    {
+      "step_id": "step_3",
+      "action": "agent_created",
+      "timestamp": "2025-09-05T20:02:08.691470",
+      "status": "TaskStatus.COMPLETED",
+      "details": {
+        "max_steps": 50
+      },
+      "duration": null,
+      "error": null
+    },
+    {
+      "step_id": "step_4",
+      "action": "task_timeout",
+      "timestamp": "2025-09-05T20:07:13.373073",
+      "status": "TaskStatus.FAILED",
+      "details": {
+        "timeout": 300
+      },
+      "duration": null,
+      "error": "Task leonardo_login_enhanced timed out after 300s"
+    },
+    {
+      "step_id": "step_5",
+      "action": "task_failed",
+      "timestamp": "2025-09-05T20:07:13.373798",
+      "status": "TaskStatus.FAILED",
+      "details": {
+        "error": "Task leonardo_login_enhanced timed out after 300s",
+        "duration": 304.6484885215759
+      },
+      "duration": null,
+      "error": "Task leonardo_login_enhanced timed out after 300s"
+    }
+  ],
+  "performance_metrics": {
+    "total_tasks": 1,
+    "successful_tasks": 0,
+    "failed_tasks": 1,
+    "average_task_duration": 0.0
+  }
+}

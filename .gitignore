@@ -1,0 +1,8 @@
+.env
+*~
+uv.lock
+*.swp
+functions/test.py
+functions/__*__/*
+__*__
+.venv

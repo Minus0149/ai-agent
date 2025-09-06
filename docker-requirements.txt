@@ -1,0 +1,79 @@
+# Base requirements from requirements.txt
+browser-use>=0.1.0
+playwright>=1.40.0
+
+# LLM and AI
+google-generativeai>=0.3.0
+openai>=1.0.0
+anthropic>=0.8.0
+
+# Environment and configuration
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+
+# Async and utilities
+aiohttp>=3.9.0
+aiofiles>=23.0.0
+requests>=2.31.0
+
+# Data processing
+pandas>=2.1.0
+numpy>=1.24.0
+
+# Logging and monitoring
+loguru>=0.7.0
+
+# File handling
+openpyxl>=3.1.0
+
+# Testing (optional)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+# Development tools (optional)
+mypy>=1.7.0
+ruff>=0.1.0
+black>=23.0.0
+
+# FastAPI and WebSocket dependencies
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+websockets>=12.0
+sse-starlette>=1.8.0
+
+# Streaming and real-time communication
+redis>=5.0.0
+celery>=5.3.0
+
+# VNC and display dependencies
+pynvml>=11.5.0
+psutil>=5.9.0
+
+# Image processing for screenshots
+Pillow>=10.1.0
+opencv-python>=4.8.0
+
+# Code generation dependencies
+jinja2>=3.1.0
+markdown>=3.5.0
+pygments>=2.16.0
+
+# Additional utilities
+click>=8.1.0
+rich>=13.7.0
+typer>=0.9.0
+
+# Security and validation
+cryptography>=41.0.0
+jwt>=1.3.1
+passlib[bcrypt]>=1.7.4
+
+# Database (optional for persistence)
+sqlalchemy>=2.0.0
+alembic>=1.12.0
+
+# Monitoring and metrics
+prometheus-client>=0.19.0
+
+# HTTP client improvements
+httpx>=0.25.0

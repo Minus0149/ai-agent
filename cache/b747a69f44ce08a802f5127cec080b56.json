@@ -1,0 +1,43 @@
+{
+  "timestamp": "2025-09-05T20:07:13.374402",
+  "task_description": "Navigate to leonardo.ai and login using a temp mail from temp-mail.io",
+  "config": {
+    "name": "Visual Automation",
+    "description": "Full visual feedback for debugging and demonstration",
+    "browser_config": {
+      "headless": false,
+      "window_size": {
+        "width": 1920,
+        "height": 1080
+      },
+      "highlight_elements": true,
+      "wait_between_actions": 1.0,
+      "enable_default_extensions": true,
+      "disable_images": false,
+      "disable_javascript": false
+    },
+    "llm_config": {
+      "model": "gemini-2.5-flash",
+      "temperature": 0.1,
+      "max_tokens": 4000
+    },
+    "performance_config": {
+      "max_steps": 50,
+      "timeout": 600,
+      "retry_attempts": 3,
+      "parallel_tasks": false
+    },
+    "tracking_config": {
+      "save_screenshots": true,
+      "save_html": true,
+      "log_level": "INFO"
+    }
+  },
+  "result": {
+    "task_id": "leonardo_login_enhanced",
+    "status": "failed",
+    "error": "Task leonardo_login_enhanced timed out after 300s",
+    "duration": 304.6484885215759,
+    "steps_count": 5
+  }
+}

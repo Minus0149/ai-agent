@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser Automation Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/dashboard.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-robot me-2"></i>
+                Browser Automation System
+            </a>
+            <div class="navbar-nav ms-auto">
+                <div class="nav-item">
+                    <span class="navbar-text me-3">
+                        <i class="fas fa-circle text-success" id="status-indicator"></i>
+                        <span id="status-text">Connected</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-3">
+        <div class="row">
+            <!-- Control Panel -->
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-play-circle me-2"></i>Automation Control</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="automation-form">
+                            <div class="mb-3">
+                                <label for="task-description" class="form-label">Task Description</label>
+                                <textarea class="form-control" id="task-description" rows="3" 
+                                    placeholder="Describe what you want to automate..."
+                                    required>Navigate to leonardo.ai and login using a temp mail from temp-mail.io</textarea>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="config-select" class="form-label">Configuration</label>
+                                    <select class="form-select" id="config-select">
+                                        <option value="">Auto-select</option>
+                                        <option value="fast_automation">Fast Automation</option>
+                                        <option value="visual_automation">Visual Automation</option>
+                                        <option value="stealth_automation">Stealth Automation</option>
+                                        <option value="data_extraction">Data Extraction</option>
+                                        <option value="form_automation">Form Automation</option>
+                                        <option value="ecommerce_automation">E-commerce</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="language-select" class="form-label">Generate Code</label>
+                                    <select class="form-select" id="language-select">
+                                        <option value="">No Code Generation</option>
+                                        <option value="python">Python</option>
+                                        <option value="javascript">JavaScript</option>
+                                        <option value="typescript">TypeScript</option>
+                                        <option value="java">Java</option>
+                                        <option value="csharp">C#</option>
+                                        <option value="go">Go</option>
+                                        <option value="rust">Rust</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="enable-vnc" checked>
+                                        <label class="form-check-label" for="enable-vnc">
+                                            Enable VNC Viewer
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="stream-output" checked>
+                                        <label class="form-check-label" for="stream-output">
+                                            Stream Output
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary" id="start-btn">
+                                    <i class="fas fa-play me-2"></i>Start Automation
+                                </button>
+                                <button type="button" class="btn btn-danger" id="stop-btn" disabled>
+                                    <i class="fas fa-stop me-2"></i>Stop Automation
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Task Status -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-tasks me-2"></i>Current Task</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="task-status">
+                            <div class="text-muted text-center py-3">
+                                No active task
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Metrics -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-line me-2"></i>Performance</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="performance-metrics">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div class="metric">
+                                        <div class="metric-value" id="total-tasks">0</div>
+                                        <div class="metric-label">Total Tasks</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="metric">
+                                        <div class="metric-value" id="success-rate">0%</div>
+                                        <div class="metric-label">Success Rate</div>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="metric">
+                                        <div class="metric-value" id="avg-duration">0s</div>
+                                        <div class="metric-label">Avg Duration</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VNC Viewer -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-desktop me-2"></i>Browser View (VNC)</h5>
+                        <div>
+                            <button class="btn btn-sm btn-outline-secondary" id="vnc-fullscreen">
+                                <i class="fas fa-expand"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-secondary" id="vnc-screenshot">
+                                <i class="fas fa-camera"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="vnc-container" class="vnc-container">
+                            <div id="vnc-status" class="vnc-status text-center py-5">
+                                <i class="fas fa-desktop fa-3x text-muted mb-3"></i>
+                                <p class="text-muted">VNC viewer will appear here when automation starts</p>
+                                <button class="btn btn-primary" id="connect-vnc">
+                                    <i class="fas fa-plug me-2"></i>Connect to VNC
+                                </button>
+                            </div>
+                            <canvas id="vnc-canvas" style="display: none;"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5><i class="fas fa-list me-2"></i>Activity Log</h5>
+                        <button class="btn btn-sm btn-outline-secondary" id="clear-log">
+                            <i class="fas fa-trash me-2"></i>Clear
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="activity-log" class="activity-log">
+                            <div class="log-entry text-muted">
+                                <span class="timestamp">[{{ "now"|date:"H:i:s" }}]</span>
+                                <span class="message">System ready. Waiting for automation tasks...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Generated Code Modal -->
+        <div class="modal fade" id="code-modal" tabindex="-1">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="fas fa-code me-2"></i>Generated Code
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="nav nav-tabs" id="code-tabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="main-code-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#main-code" type="button" role="tab">Main Code</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tests-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#tests" type="button" role="tab">Tests</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="docs-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#docs" type="button" role="tab">Documentation</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="code-tab-content">
+                            <div class="tab-pane fade show active" id="main-code" role="tabpanel">
+                                <pre><code id="main-code-content" class="language-python"></code></pre>
+                            </div>
+                            <div class="tab-pane fade" id="tests" role="tabpanel">
+                                <pre><code id="tests-content" class="language-python"></code></pre>
+                            </div>
+                            <div class="tab-pane fade" id="docs" role="tabpanel">
+                                <div id="docs-content"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" id="download-code">
+                            <i class="fas fa-download me-2"></i>Download Code
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/novnc/1.3.0/core/rfb.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

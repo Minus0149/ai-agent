@@ -1,0 +1,36 @@
+# Core browser automation
+browser-use>=0.1.0
+playwright>=1.40.0
+
+# LLM and AI
+google-generativeai>=0.3.0
+openai>=1.0.0
+anthropic>=0.8.0
+
+# Environment and configuration
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+
+# Async and utilities
+aiohttp>=3.9.0
+aiofiles>=23.0.0
+requests>=2.31.0
+
+# Data processing
+pandas>=2.1.0
+numpy>=1.24.0
+
+# Logging and monitoring
+loguru>=0.7.0
+
+# File handling
+openpyxl>=3.1.0
+
+# Testing (optional)
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+
+# Development tools (optional)
+mypy>=1.7.0
+ruff>=0.1.0
+black>=23.0.0
