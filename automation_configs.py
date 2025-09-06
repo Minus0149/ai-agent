@@ -22,14 +22,23 @@ CONFIG_TEMPLATES = {
         "name": "Fast Automation",
         "description": "Optimized for speed with minimal visual feedback",
         "browser_config": {
-            "headless": True,
+            "headless": False,
+            "browser_type": "chromium",
+            "executable_path": "/usr/bin/chromium-browser",
             "window_size": {"width": 1280, "height": 720},
             "highlight_elements": False,
             "wait_between_actions": 0.1,
             "enable_default_extensions": False,
             "disable_images": True,
             "disable_javascript": False,
-            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "args": [
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--disable-web-security",
+                "--disable-features=VizDisplayCompositor"
+            ]
         },
         "llm_config": {
             "model": "gemini-2.5-flash",
@@ -54,12 +63,21 @@ CONFIG_TEMPLATES = {
         "description": "Full visual feedback for debugging and demonstration",
         "browser_config": {
             "headless": False,
+            "browser_type": "chromium",
+            "executable_path": "/usr/bin/chromium-browser",
             "window_size": {"width": 1920, "height": 1080},
             "highlight_elements": True,
             "wait_between_actions": 1.0,
             "enable_default_extensions": True,
             "disable_images": False,
-            "disable_javascript": False
+            "disable_javascript": False,
+            "args": [
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--disable-web-security",
+                "--disable-features=VizDisplayCompositor"
+            ]
         },
         "llm_config": {
             "model": "gemini-2.5-flash",
@@ -84,13 +102,22 @@ CONFIG_TEMPLATES = {
         "description": "Designed to avoid detection with human-like behavior",
         "browser_config": {
             "headless": False,
+            "browser_type": "chromium",
+            "executable_path": "/usr/bin/chromium-browser",
             "window_size": {"width": 1366, "height": 768},
             "highlight_elements": False,
             "wait_between_actions": 2.0,
             "enable_default_extensions": True,
             "disable_images": False,
             "disable_javascript": False,
-            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "args": [
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--disable-web-security",
+                "--disable-features=VizDisplayCompositor"
+            ]
         },
         "llm_config": {
             "model": "gemini-2.5-flash",
@@ -120,12 +147,21 @@ CONFIG_TEMPLATES = {
         "description": "Optimized for web scraping and data collection",
         "browser_config": {
             "headless": True,
+            "browser_type": "chromium",
+            "executable_path": "/usr/bin/chromium-browser",
             "window_size": {"width": 1920, "height": 1080},
             "highlight_elements": False,
             "wait_between_actions": 0.5,
             "enable_default_extensions": False,
             "disable_images": True,
-            "disable_javascript": False
+            "disable_javascript": False,
+            "args": [
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--disable-web-security",
+                "--disable-features=VizDisplayCompositor"
+            ]
         },
         "llm_config": {
             "model": "gemini-2.5-flash",
@@ -155,12 +191,21 @@ CONFIG_TEMPLATES = {
         "description": "Specialized for form filling and submission",
         "browser_config": {
             "headless": False,
+            "browser_type": "chromium",
+            "executable_path": "/usr/bin/chromium-browser",
             "window_size": {"width": 1440, "height": 900},
             "highlight_elements": True,
             "wait_between_actions": 0.8,
             "enable_default_extensions": True,
             "disable_images": False,
-            "disable_javascript": False
+            "disable_javascript": False,
+            "args": [
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--disable-web-security",
+                "--disable-features=VizDisplayCompositor"
+            ]
         },
         "llm_config": {
             "model": "gemini-2.5-flash",
@@ -190,12 +235,21 @@ CONFIG_TEMPLATES = {
         "description": "Optimized for online shopping and product research",
         "browser_config": {
             "headless": False,
+            "browser_type": "chromium",
+            "executable_path": "/usr/bin/chromium-browser",
             "window_size": {"width": 1600, "height": 1000},
             "highlight_elements": True,
             "wait_between_actions": 1.2,
             "enable_default_extensions": True,
             "disable_images": False,
-            "disable_javascript": False
+            "disable_javascript": False,
+            "args": [
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--disable-web-security",
+                "--disable-features=VizDisplayCompositor"
+            ]
         },
         "llm_config": {
             "model": "gemini-2.5-flash",
@@ -226,12 +280,21 @@ CONFIG_TEMPLATES = {
         "description": "For social media interactions and content management",
         "browser_config": {
             "headless": False,
+            "browser_type": "chromium",
+            "executable_path": "/usr/bin/chromium-browser",
             "window_size": {"width": 1280, "height": 800},
             "highlight_elements": True,
             "wait_between_actions": 2.5,
             "enable_default_extensions": True,
             "disable_images": False,
-            "disable_javascript": False
+            "disable_javascript": False,
+            "args": [
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--disable-web-security",
+                "--disable-features=VizDisplayCompositor"
+            ]
         },
         "llm_config": {
             "model": "gemini-2.5-flash",
@@ -262,12 +325,21 @@ CONFIG_TEMPLATES = {
         "description": "For automated testing and quality assurance",
         "browser_config": {
             "headless": True,
+            "browser_type": "chromium",
+            "executable_path": "/usr/bin/chromium-browser",
             "window_size": {"width": 1920, "height": 1080},
             "highlight_elements": False,
             "wait_between_actions": 0.3,
             "enable_default_extensions": False,
             "disable_images": True,
-            "disable_javascript": False
+            "disable_javascript": False,
+            "args": [
+                "--no-sandbox",
+                "--disable-dev-shm-usage",
+                "--disable-gpu",
+                "--disable-web-security",
+                "--disable-features=VizDisplayCompositor"
+            ]
         },
         "llm_config": {
             "model": "gemini-2.5-flash",

@@ -5,136 +5,91 @@ import os
 import sys
 import subprocess
 import argparse
+import shutil
 import time
 from pathlib import Path
+import json
+from typing import List, Dict, Any
 
-class VPSDeployer:
+class VPSAutomationDeployer:
     """Handles VPS-specific deployment of the browser automation system."""
     
     def __init__(self):
         self.project_root = Path(__file__).parent
-        self.docker_compose_file = self.project_root / "docker-compose.yml"
+        self.docker_compose_file = self.project_root / "docker-compose.vps.yml"
         self.env_file = self.project_root / ".env"
         self.env_example = self.project_root / ".env.example"
         
-    def check_vps_requirements(self) -> bool:
-        """Check VPS-specific requirements."""
-        print("🔍 Checking VPS requirements...")
+    def check_vps_prerequisites(self) -> bool:
+        """Check VPS-specific prerequisites."""
+        print("🔍 Checking VPS prerequisites...")
         
-        # Check available memory
-        try:
-            result = subprocess.run(["free", "-m"], capture_output=True, text=True)
-            if result.returncode == 0:
-                lines = result.stdout.strip().split('\n')
-                mem_line = lines[1].split()
-                total_mem = int(mem_line[1])
-                if total_mem < 2048:
-                    print(f"⚠️  Warning: Low memory detected ({total_mem}MB). Recommended: 2GB+")
-                else:
-                    print(f"✅ Memory: {total_mem}MB")
-        except Exception:
-            print("⚠️  Could not check memory")
+        required_commands = [
+            ("docker", "Docker is required for containerized deployment"),
+            ("docker-compose", "Docker Compose is required for orchestration")
+        ]
         
-        # Check disk space
-        try:
-            result = subprocess.run(["df", "-h", "."], capture_output=True, text=True)
-            if result.returncode == 0:
-                lines = result.stdout.strip().split('\n')
-                disk_line = lines[1].split()
-                available = disk_line[3]
-                print(f"✅ Disk space available: {available}")
-        except Exception:
-            print("⚠️  Could not check disk space")
+        missing = []
+        for cmd, description in required_commands:
+            if not shutil.which(cmd):
+                missing.append((cmd, description))
         
+        if missing:
+            print("❌ Missing prerequisites:")
+            for cmd, desc in missing:
+                print(f"   - {cmd}: {desc}")
+            print("\n📋 Install Docker on your VPS:")
+            print("   curl -fsSL https://get.docker.com -o get-docker.sh")
+            print("   sudo sh get-docker.sh")
+            print("   sudo usermod -aG docker $USER")
+            return False
+        
+        print("✅ VPS prerequisites checked")
         return True
     
-    def setup_environment(self) -> bool:
-        """Set up environment configuration for VPS."""
-        print("🔧 Setting up VPS environment...")
-        
-        if not self.env_file.exists():
-            if self.env_example.exists():
-                # Copy and modify for VPS
-                with open(self.env_example, 'r') as f:
-                    content = f.read()
-                
-                # VPS-specific modifications
-                content = content.replace(
-                    "GOOGLE_API_KEY=your_google_api_key_here",
-                    "GOOGLE_API_KEY=AIzaSyDummy_Key_Replace_With_Your_Actual_Key"
-                )
-                content += "\n# VPS-specific settings\n"
-                content += "DOCKER_BUILDKIT=1\n"
-                content += "COMPOSE_DOCKER_CLI_BUILD=1\n"
-                
-                with open(self.env_file, 'w') as f:
-                    f.write(content)
-                
-                print(f"📋 Created VPS-optimized .env file")
-                print("⚠️  Please edit .env file with your actual API keys")
-                return True
-            else:
-                print("❌ No .env.example file found")
-                return False
-        
-        print("✅ Environment file exists")
-        return True
-    
-    def build_with_retry(self, max_retries: int = 3) -> bool:
-        """Build Docker images with retry logic for VPS."""
-        print(f"🏗️  Building Docker images (max {max_retries} retries)...")
-        
-        for attempt in range(max_retries):
-            try:
-                print(f"Attempt {attempt + 1}/{max_retries}")
-                
-                # Use BuildKit for better caching and performance
-                env = os.environ.copy()
-                env['DOCKER_BUILDKIT'] = '1'
-                env['COMPOSE_DOCKER_CLI_BUILD'] = '1'
-                
-                result = subprocess.run(
-                    ["docker-compose", "build", "--no-cache", "automation-backend"],
-                    cwd=self.project_root,
-                    env=env,
-                    capture_output=True,
-                    text=True,
-                    timeout=3600  # 1 hour timeout
-                )
-                
-                if result.returncode == 0:
-                    print("✅ Docker images built successfully")
-                    return True
-                else:
-                    print(f"❌ Build attempt {attempt + 1} failed:")
-                    print(result.stderr[-1000:])  # Show last 1000 chars of error
-                    
-                    if attempt < max_retries - 1:
-                        print(f"Retrying in 30 seconds...")
-                        time.sleep(30)
-                    
-            except subprocess.TimeoutExpired:
-                print(f"❌ Build attempt {attempt + 1} timed out")
-                if attempt < max_retries - 1:
-                    print(f"Retrying in 30 seconds...")
-                    time.sleep(30)
-            except Exception as e:
-                print(f"❌ Build attempt {attempt + 1} error: {e}")
-                if attempt < max_retries - 1:
-                    print(f"Retrying in 30 seconds...")
-                    time.sleep(30)
-        
-        print("❌ All build attempts failed")
-        return False
-    
-    def start_services_vps(self) -> bool:
-        """Start services with VPS-specific settings."""
-        print("🚀 Starting services on VPS...")
+    def build_vps_images(self) -> bool:
+        """Build Docker images with VPS-specific optimizations."""
+        print("🏗️  Building VPS-optimized Docker images...")
         
         try:
-            # Start with limited resources
+            cmd = ["docker-compose", "-f", str(self.docker_compose_file), "build", "--no-cache"]
+            
             result = subprocess.run(
-                ["docker-compose", "up", "-d", "--remove-orphans"],
+                cmd,
+                cwd=self.project_root,
+                capture_output=True,
+                text=True
+            )
+            
+            if result.returncode != 0:
+                print(f"❌ Build failed: {result.stderr}")
+                print("\n🔧 Troubleshooting tips:")
+                print("   - Check internet connectivity")
+                print("   - Ensure sufficient disk space (10GB+)")
+                print("   - Try: docker system prune -f")
+                return False
+            
+            print("✅ VPS-optimized Docker images built successfully")
+            return True
+            
+        except Exception as e:
+            print(f"❌ Error building images: {e}")
+            return False
+    
+    def start_vps_services(self, profiles: List[str] = None) -> bool:
+        """Start Docker services with VPS-specific configuration."""
+        profiles = profiles or []
+        
+        print(f"🚀 Starting VPS services{' with profiles: ' + ', '.join(profiles) if profiles else ''}...")
+        
+        try:
+            cmd = ["docker-compose", "-f", str(self.docker_compose_file), "up", "-d"]
+            
+            for profile in profiles:
+                cmd.extend(["--profile", profile])
+            
+            result = subprocess.run(
+                cmd,
                 cwd=self.project_root,
                 capture_output=True,
                 text=True
@@ -144,7 +99,7 @@ class VPSDeployer:
                 print(f"❌ Failed to start services: {result.stderr}")
                 return False
             
-            print("✅ Services started successfully")
+            print("✅ VPS services started successfully")
             
             # Wait for services to be ready
             print("⏳ Waiting for services to initialize...")
@@ -156,86 +111,114 @@ class VPSDeployer:
             print(f"❌ Error starting services: {e}")
             return False
     
-    def health_check_vps(self) -> bool:
+    def vps_health_check(self) -> Dict[str, Any]:
         """Perform VPS-specific health check."""
         print("🏥 Performing VPS health check...")
         
         services = {
-            "Redis": ("docker", "exec", "automation-redis", "redis-cli", "ping"),
-            "Backend": ("curl", "-f", "http://localhost:8000/health"),
+            "FastAPI Backend": "http://localhost:8000/health",
+            "VNC Server": "localhost:5901",
+            "Redis": "localhost:6379"
         }
         
-        all_healthy = True
+        results = {}
         
-        for service, cmd in services.items():
+        for service, endpoint in services.items():
             try:
-                result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
-                if result.returncode == 0:
-                    print(f"   ✅ {service}: Healthy")
-                else:
-                    print(f"   ❌ {service}: Unhealthy")
-                    all_healthy = False
+                if service == "FastAPI Backend":
+                    import requests
+                    response = requests.get(endpoint, timeout=10)
+                    results[service] = "✅ Healthy" if response.status_code == 200 else "❌ Unhealthy"
+                elif service == "VNC Server":
+                    import socket
+                    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                    sock.settimeout(5)
+                    result = sock.connect_ex(('localhost', 5901))
+                    sock.close()
+                    results[service] = "✅ Healthy" if result == 0 else "❌ Unhealthy"
+                elif service == "Redis":
+                    import redis
+                    r = redis.Redis(host='localhost', port=6379, decode_responses=True, socket_timeout=5)
+                    r.ping()
+                    results[service] = "✅ Healthy"
             except Exception as e:
-                print(f"   ❌ {service}: Error - {str(e)[:50]}")
-                all_healthy = False
+                results[service] = f"❌ Error: {str(e)[:50]}"
         
-        return all_healthy
+        for service, status in results.items():
+            print(f"   {service}: {status}")
+        
+        return results
     
-    def deploy_vps(self) -> bool:
+    def deploy_to_vps(self, profiles: List[str] = None, build: bool = True) -> bool:
         """Full VPS deployment process."""
         print("🚀 Starting VPS Browser Automation System Deployment")
         print("=" * 60)
         
-        # Check VPS requirements
-        if not self.check_vps_requirements():
+        # Check VPS prerequisites
+        if not self.check_vps_prerequisites():
             return False
         
         # Setup environment
-        if not self.setup_environment():
-            return False
+        if not self.env_file.exists():
+            if self.env_example.exists():
+                shutil.copy(self.env_example, self.env_file)
+                print(f"📋 Created .env file from template")
+                print("⚠️  Please edit .env file with your API keys before continuing")
+                return False
         
-        # Build with retry
-        if not self.build_with_retry():
-            print("\n💡 Build failed. Troubleshooting tips:")
-            print("   1. Check if you have enough disk space (need ~5GB)")
-            print("   2. Check if you have enough memory (need ~2GB)")
-            print("   3. Try: docker system prune -a")
-            print("   4. Check VPS network connectivity")
+        # Build images if requested
+        if build and not self.build_vps_images():
             return False
         
         # Start services
-        if not self.start_services_vps():
+        if not self.start_vps_services(profiles):
             return False
         
-        # Health check
-        if not self.health_check_vps():
-            print("⚠️  Some services may not be fully ready yet")
+        # Perform health check
+        self.vps_health_check()
         
         print("\n" + "=" * 60)
-        print("🎉 VPS Deployment completed!")
+        print("🎉 VPS Deployment completed successfully!")
         print("\n📱 Access URLs:")
         print("   - Dashboard: http://YOUR_VPS_IP:80")
         print("   - API Docs: http://YOUR_VPS_IP:8000/api/docs")
-        print("   - VNC: vnc://YOUR_VPS_IP:5901 (password: automation)")
+        print("   - VNC Viewer: vnc://YOUR_VPS_IP:5901 (password: automation)")
         print("   - Web VNC: http://YOUR_VPS_IP:6080")
         
-        print("\n🔒 Security Notes:")
-        print("   - Configure firewall to allow ports 80, 8000, 5901, 6080")
-        print("   - Consider using HTTPS in production")
-        print("   - Change default VNC password")
+        print("\n💡 VPS Management Tips:")
+        print("   - Monitor resources: docker stats")
+        print("   - View logs: docker-compose -f docker-compose.vps.yml logs -f")
+        print("   - Update system: docker-compose -f docker-compose.vps.yml pull")
+        print("   - Backup data: tar -czf backup.tar.gz logs cache configs reports")
         
         return True
 
 def main():
     parser = argparse.ArgumentParser(description="VPS Browser Automation System Deployment")
-    parser.add_argument("--retry", type=int, default=3, help="Number of build retries")
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+    
+    # Deploy command
+    deploy_parser = subparsers.add_parser("deploy", help="Deploy to VPS")
+    deploy_parser.add_argument("--no-build", action="store_true", help="Skip building images")
+    
+    # Other commands
+    subparsers.add_parser("health", help="Perform health check")
     
     args = parser.parse_args()
     
-    deployer = VPSDeployer()
-    success = deployer.deploy_vps()
+    deployer = VPSAutomationDeployer()
     
-    sys.exit(0 if success else 1)
+    if args.command == "deploy" or args.command is None:
+        build = not (args.command == "deploy" and args.no_build)
+        success = deployer.deploy_to_vps([], build)
+        sys.exit(0 if success else 1)
+    
+    elif args.command == "health":
+        deployer.vps_health_check()
+    
+    else:
+        parser.print_help()
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
