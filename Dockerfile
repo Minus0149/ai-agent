@@ -41,26 +41,14 @@ RUN apt-get update && apt-get install -y \
     nginx \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Chrome/Chromium (VPS-compatible with fallback)
+# Install Chromium browser (reliable alternative to Chrome)
 RUN apt-get update && apt-get install -y \
-    curl \
-    gnupg \
-    ca-certificates \
-    && ( \
-        # Try to install Google Chrome
-        curl -fsSL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome-keyring.gpg \
-        && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] https://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list \
-        && apt-get update \
-        && apt-get install -y google-chrome-stable --no-install-recommends \
-        && echo "Google Chrome installed successfully" \
-    ) || ( \
-        # Fallback to Chromium if Chrome fails
-        echo "Chrome installation failed, installing Chromium as fallback" \
-        && apt-get update \
-        && apt-get install -y chromium-browser --no-install-recommends \
-        && echo "Chromium installed successfully" \
-    ) \
-    && rm -rf /var/lib/apt/lists/*
+    chromium-browser \
+    chromium-chromedriver \
+    --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/* \
+    && chromium-browser --version \
+    && echo "Chromium browser installed successfully"
 
 # Create application user
 RUN useradd -m -s /bin/bash automation && \
@@ -106,9 +94,10 @@ COPY docker-requirements.txt .
 # Install Python dependencies with uv
 RUN uv pip install --system -r docker-requirements.txt
 
-# Install Playwright browsers
-RUN playwright install chromium && \
-    playwright install-deps chromium
+# Install Playwright browsers (using system Chromium)
+RUN playwright install-deps chromium && \
+    echo "Using system Chromium browser" && \
+    ln -sf /usr/bin/chromium-browser /usr/bin/chromium
 
 # Copy application code
 COPY . .
